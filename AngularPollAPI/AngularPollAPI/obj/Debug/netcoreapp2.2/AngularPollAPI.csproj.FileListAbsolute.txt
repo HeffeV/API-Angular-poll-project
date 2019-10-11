@@ -1,0 +1,16 @@
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\bin\Debug\netcoreapp2.2\appsettings.Development.json
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\bin\Debug\netcoreapp2.2\appsettings.json
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\bin\Debug\netcoreapp2.2\Properties\launchSettings.json
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\bin\Debug\netcoreapp2.2\AngularPollAPI.deps.json
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\bin\Debug\netcoreapp2.2\AngularPollAPI.runtimeconfig.json
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\bin\Debug\netcoreapp2.2\AngularPollAPI.runtimeconfig.dev.json
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\bin\Debug\netcoreapp2.2\AngularPollAPI.dll
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\obj\Debug\netcoreapp2.2\AngularPollAPI.csprojAssemblyReference.cache
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\obj\Debug\netcoreapp2.2\AngularPollAPI.RazorAssemblyInfo.cache
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\obj\Debug\netcoreapp2.2\AngularPollAPI.RazorAssemblyInfo.cs
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\obj\Debug\netcoreapp2.2\AngularPollAPI.AssemblyInfoInputs.cache
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\obj\Debug\netcoreapp2.2\AngularPollAPI.AssemblyInfo.cs
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\obj\Debug\netcoreapp2.2\AngularPollAPI.RazorTargetAssemblyInfo.cache
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\bin\Debug\netcoreapp2.2\AngularPollAPI.pdb
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\obj\Debug\netcoreapp2.2\AngularPollAPI.dll
+C:\Users\jeffv\Documents\AngularAPI\AngularPollAPI\AngularPollAPI\obj\Debug\netcoreapp2.2\AngularPollAPI.pdb
