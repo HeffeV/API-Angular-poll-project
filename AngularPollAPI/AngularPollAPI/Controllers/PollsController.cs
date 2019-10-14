@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AngularPollAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AngularPollAPI.Controllers
 {
@@ -21,10 +22,25 @@ namespace AngularPollAPI.Controllers
         }
 
         // GET: api/Polls
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Poll>>> GetPolls()
         {
+            var userID = User.Claims.FirstOrDefault(c => c.Type == "UserID").Value;
             return await _context.Polls.ToListAsync();
+        }
+
+        // POST: api/Polls
+        [HttpGet]
+        [Route("homePageStats")]
+        public ActionResult<HomePageStats> HomePageStats()
+        {
+            HomePageStats homePageStats = new HomePageStats();
+
+            homePageStats.AmountPolls = _context.Polls.Count();
+            homePageStats.AmountUsers = _context.Users.Count();
+
+            return homePageStats;
         }
 
         // GET: api/Polls/5

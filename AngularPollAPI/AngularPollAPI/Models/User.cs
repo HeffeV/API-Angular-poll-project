@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,5 +14,7 @@ namespace AngularPollAPI.Models
         public string Username { get; set; }
         public ICollection<PollUser> PollUsers { get; set; }
         public ICollection<Friend> Friends { get; set; }
+        [NotMapped]
+        public string Token { get; set; }
     }
 }
