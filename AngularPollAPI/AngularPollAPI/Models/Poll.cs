@@ -9,6 +9,8 @@ namespace AngularPollAPI.Models
     {
         public int PollID { get; set; }
         public string Name { get; set; }
+
+        public bool Accepted { get; set; }
         public ICollection<PollAnswer> PollAnswers { get; set; }
         public ICollection<PollUser> PollUsers { get; set; }
     }

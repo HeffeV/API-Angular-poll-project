@@ -22,12 +22,30 @@ namespace AngularPollAPI.Controllers
         }
 
         // GET: api/Polls
-        [Authorize]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Poll>>> GetPolls()
+        public ActionResult<IEnumerable<Poll>> GetPollsFromUser(int userid)
         {
-            var userID = User.Claims.FirstOrDefault(c => c.Type == "UserID").Value;
-            return await _context.Polls.ToListAsync();
+            var pollUser = _context.PollUsers.Where(p => p.UserID == userid).ToList();
+            List<Poll> polls = new List<Poll>();
+
+            foreach (PollUser polluser in pollUser)
+            {
+                polls.Add(_context.Polls.SingleOrDefault(p => p.PollID == polluser.PollID));
+            }
+
+            foreach(Poll poll in polls)
+            {
+                poll.PollAnswers = (_context.PollAnswers.Where(p => p.PollID == poll.PollID).ToList());
+
+                foreach (PollAnswer pollAnswer in poll.PollAnswers)
+                {
+                    pollAnswer.PollAnswerVotes = _context.PollAnswerVotes.Where(p => p.PollAnswerID == pollAnswer.PollAnswerID).ToList();
+                }
+
+            }
+
+
+            return polls;
         }
 
         // POST: api/Polls

@@ -29,6 +29,7 @@ namespace AngularPollAPI.Models
             pollUser.Poll = new Poll()
             {
                 Name = "TestPoll",
+                Accepted = true,
                 PollAnswers = new List<PollAnswer>()
                 {
                     new PollAnswer()
@@ -52,6 +53,29 @@ namespace AngularPollAPI.Models
 
             context.Users.AddRange(user);
             context.PollUsers.AddRange(pollUser);
+
+            pollUser = new PollUser();
+
+            pollUser.User = user;
+            pollUser.Poll = new Poll()
+            {
+                Name = "NotMyTestPoll",
+                Accepted = false,
+                PollAnswers = new List<PollAnswer>()
+                {
+                    new PollAnswer()
+                    {
+                        Answer="Yes", Poll=pollUser.Poll
+                    },
+                    new PollAnswer()
+                    {
+                        Answer="No", Poll=pollUser.Poll
+                    }
+                }
+
+            };
+            context.PollUsers.AddRange(pollUser);
+
             //context.Polls.AddRange(poll);
             //context.PollAnswers.AddRange(pollAnswer, pollAnswer2);
             //context.PollAnswerVotes.Add(pollAnswerVote);

@@ -75,10 +75,18 @@ namespace AngularPollAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            if (!_context.Users.Any(e=>e.Username==user.Username)&& !_context.Users.Any(e => e.Email == user.Email))
+            {
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.UserID }, user);
+                return CreatedAtAction("GetUser", new { id = user.UserID }, user);
+            }
+            else
+            {
+                return BadRequest();
+            }
+
         }
 
         // DELETE: api/User/5
