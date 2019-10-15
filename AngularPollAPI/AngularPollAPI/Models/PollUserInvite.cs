@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 
 namespace AngularPollAPI.Models
 {
-    public class Poll
+    public class PollUserInvite
     {
+        public int PollUserInviteID { get; set; }
         public int PollID { get; set; }
-        public string Name { get; set; }
-        public ICollection<PollAnswer> PollAnswers { get; set; }
-        public ICollection<PollUser> PollUsers { get; set; }
+        public Poll Poll { get; set; }
     }
 }

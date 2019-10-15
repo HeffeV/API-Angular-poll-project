@@ -8,6 +8,6 @@ namespace AngularPollAPI.Models
     public class Friend
     {
         public int FriendID { get; set; }
-        public int UserID { get; set; }
+        public int UserFriendID { get; set; }
     }
 }

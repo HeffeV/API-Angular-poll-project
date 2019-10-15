@@ -21,7 +21,7 @@ namespace AngularPollAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Polls
+        [Authorize]
         [HttpGet]
         public ActionResult<IEnumerable<Poll>> GetPollsFromUser(int userid)
         {
@@ -48,7 +48,73 @@ namespace AngularPollAPI.Controllers
             return polls;
         }
 
-        // POST: api/Polls
+        [Authorize]
+        [HttpGet]
+        [Route("pollInvites")]
+        public ActionResult<IEnumerable<Poll>> GetPollInvites(int userid)
+        {
+            User user = _context.Users.Include(inv => inv.PollUserInvites).SingleOrDefault(u => u.UserID == userid);
+            List<Poll> polls = new List<Poll>();
+
+            foreach (PollUserInvite pollInvite in user.PollUserInvites)
+            {
+                polls.Add(_context.Polls.Find(pollInvite.PollID));
+            }
+
+            return polls;
+        }
+
+
+        [Authorize]
+        [HttpPost]
+        [Route("acceptPoll")]
+        public ActionResult<Poll> AcceptPoll(int userID,int pollID)
+        {
+            var user = _context.Users.Include(inv=>inv.PollUserInvites).SingleOrDefault(p=>p.UserID==userID);
+
+            if (user != null)
+            {
+                var invite = user.PollUserInvites.FirstOrDefault(p => p.PollID == pollID);
+
+                _context.PollUserInvites.Remove(invite);
+
+                PollUser pollUser = new PollUser()
+                {
+                    PollID = invite.PollID,
+                    UserID = user.UserID
+                };
+
+                _context.PollUsers.Add(pollUser);
+
+                _context.SaveChanges();
+
+                var poll = _context.Polls.FirstOrDefault(p => p.PollID == pollID);
+
+                return poll;
+            }
+            else return BadRequest();
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("declinePoll")]
+        public ActionResult<Poll> DeclinePoll(int userID, int pollID)
+        {
+            var user = _context.Users.Include(inv => inv.PollUserInvites).SingleOrDefault(p => p.UserID == userID);
+
+            if (user != null)
+            {
+                var invite = user.PollUserInvites.FirstOrDefault(p => p.PollID == pollID);
+
+                _context.PollUserInvites.Remove(invite);
+
+                _context.SaveChanges();
+
+                return null;
+            }
+            else return BadRequest();
+        }
+
         [HttpGet]
         [Route("homePageStats")]
         public ActionResult<HomePageStats> HomePageStats()

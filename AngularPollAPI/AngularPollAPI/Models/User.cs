@@ -14,6 +14,7 @@ namespace AngularPollAPI.Models
         public string Username { get; set; }
         public ICollection<PollUser> PollUsers { get; set; }
         public ICollection<Friend> Friends { get; set; }
+        public ICollection<PollUserInvite> PollUserInvites { get; set; }
         [NotMapped]
         public string Token { get; set; }
     }

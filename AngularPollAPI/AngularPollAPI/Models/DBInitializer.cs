@@ -23,13 +23,20 @@ namespace AngularPollAPI.Models
             user.Username = "Admin";
             user.Password = "admin";
             user.Email = "admin@thomasmore.be";
-            user.PollUsers = new List<PollUser>() { pollUser};
+            user.PollUsers = new List<PollUser>() { pollUser };
+
+            user.Friends = new List<Friend>()
+            {
+                new Friend()
+                {
+                    UserFriendID = 2
+                }
+            };
 
             pollUser.User = user;
             pollUser.Poll = new Poll()
             {
                 Name = "TestPoll",
-                Accepted = true,
                 PollAnswers = new List<PollAnswer>()
                 {
                     new PollAnswer()
@@ -48,19 +55,14 @@ namespace AngularPollAPI.Models
                         Answer="No", Poll=pollUser.Poll
                     }
                 }
-                
+
             };
 
-            context.Users.AddRange(user);
             context.PollUsers.AddRange(pollUser);
 
-            pollUser = new PollUser();
-
-            pollUser.User = user;
-            pollUser.Poll = new Poll()
+            Poll Poll = new Poll()
             {
-                Name = "NotMyTestPoll",
-                Accepted = false,
+                Name = "Poll Invited",
                 PollAnswers = new List<PollAnswer>()
                 {
                     new PollAnswer()
@@ -74,7 +76,30 @@ namespace AngularPollAPI.Models
                 }
 
             };
-            context.PollUsers.AddRange(pollUser);
+
+            user.PollUserInvites = new List<PollUserInvite>()
+            {
+                new PollUserInvite()
+                {
+                    Poll = Poll
+                }
+            };
+
+        context.Users.AddRange(user);
+            context.Polls.AddRange(Poll);
+
+            User user2 = new User();
+            user2.Username = "Admin2";
+            user2.Password = "admin2";
+            user2.Email = "admin2@thomasmore.be";
+            user2.Friends = new List<Friend>()
+            {
+                new Friend()
+                {
+                    UserFriendID = 1
+                }
+            };
+            context.Users.AddRange(user2);
 
             //context.Polls.AddRange(poll);
             //context.PollAnswers.AddRange(pollAnswer, pollAnswer2);
