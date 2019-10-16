@@ -61,6 +61,8 @@ namespace AngularPollAPI.Controllers
                 polls.Add(_context.Polls.Find(pollInvite.PollID));
             }
 
+            
+
             return polls;
         }
 
@@ -81,7 +83,8 @@ namespace AngularPollAPI.Controllers
                 PollUser pollUser = new PollUser()
                 {
                     PollID = invite.PollID,
-                    UserID = user.UserID
+                    UserID = user.UserID,
+                    PollOwner = false
                 };
 
                 _context.PollUsers.Add(pollUser);
@@ -110,10 +113,46 @@ namespace AngularPollAPI.Controllers
 
                 _context.SaveChanges();
 
-                return null;
+                return Ok();
             }
             else return BadRequest();
         }
+        [Authorize]
+        [HttpPost]
+        [Route("pollVote")]
+        public ActionResult<IEnumerable<PollAnswer>> PollVote(int userID, int pollAnswerID,int pollID)
+        {
+            //check if poll can have multiple votes
+            if (_context.Polls.Find(pollID).SingleVote)
+            {
+                //check for existing vote for that poll if poll only has single vote option
+                var pollAnswers = _context.PollAnswers.Where(e => e.PollID == pollID);
+                var PollVotes = new List<PollAnswerVote>();
+                foreach(PollAnswer pa in pollAnswers)
+                {
+                    PollVotes.AddRange(_context.PollAnswerVotes.Where(e => e.PollAnswerID == pa.PollAnswerID && e.UserID == userID));
+                }
+
+                if (PollVotes != null)
+                {
+                    _context.PollAnswerVotes.RemoveRange(PollVotes);
+                }
+
+            }
+
+            //create new vote
+            PollAnswerVote pollAnswerVote = new PollAnswerVote();
+            pollAnswerVote.PollAnswerID = pollAnswerID;
+            pollAnswerVote.UserID = userID;
+            pollAnswerVote.User = _context.Users.SingleOrDefault(e => e.UserID == userID);
+            pollAnswerVote.PollAnswer = _context.PollAnswers.SingleOrDefault(e => e.PollAnswerID == pollAnswerID);
+
+            _context.PollAnswerVotes.Add(pollAnswerVote);
+            _context.SaveChanges();
+            
+            return Ok();
+        }
+
 
         [HttpGet]
         [Route("homePageStats")]
@@ -139,46 +178,6 @@ namespace AngularPollAPI.Controllers
             }
 
             return poll;
-        }
-
-        // PUT: api/Polls/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPoll(int id, Poll poll)
-        {
-            if (id != poll.PollID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(poll).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PollExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Polls
-        [HttpPost]
-        public async Task<ActionResult<Poll>> PostPoll(Poll poll)
-        {
-            _context.Polls.Add(poll);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetPoll", new { id = poll.PollID }, poll);
         }
 
         // DELETE: api/Polls/5

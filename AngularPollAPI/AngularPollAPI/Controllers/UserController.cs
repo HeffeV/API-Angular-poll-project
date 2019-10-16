@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AngularPollAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AngularPollAPI.Controllers
 {
@@ -40,6 +41,7 @@ namespace AngularPollAPI.Controllers
 
             return user;
         }
+        [Authorize]
         [HttpGet]
         [Route("getFriends")]
         public ActionResult<IEnumerable<User>> GetUserFriends(int userid)
@@ -50,10 +52,98 @@ namespace AngularPollAPI.Controllers
 
             foreach (Friend friend in userFriends)
             {
-                friends.Add(_context.Users.SingleOrDefault(u => u.UserID == friend.UserFriendID));
+                User temp = new User();
+                temp = _context.Users.SingleOrDefault(u => u.UserID == friend.UserFriendID && friend.Status == 3);
+                if (temp != null)
+                {
+                    temp.Password = null;
+                    friends.Add(temp);
+                }
             }
 
             return friends;
+        }
+        [Authorize]
+        [HttpGet]
+        [Route("getFriendRequests")]
+        public ActionResult<IEnumerable<User>> GetFriendRequests(int userid)
+        {
+            var userFriends = _context.Users.Include(u => u.Friends).SingleOrDefault(u => u.UserID == userid).Friends;
+
+            List<User> friends = new List<User>();
+
+            foreach (Friend friend in userFriends)
+            {
+                User temp = new User();
+                temp = _context.Users.SingleOrDefault(u => u.UserID == friend.UserFriendID && friend.Status == 2);
+                if (temp != null)
+                {
+                    temp.Password = null;
+                    friends.Add(temp);
+                }
+            }
+
+            return friends;
+        }
+        [Authorize]
+        [HttpPost]
+        [Route("deleteFriend")]
+        public ActionResult<Friend> DeleteFriend(int userid,int friendid)
+        {
+            var userFriend = _context.Users.Include(u => u.Friends).SingleOrDefault(u => u.UserID == userid).Friends.SingleOrDefault(f=>f.UserFriendID==friendid);
+
+            if (userFriend != null)
+            {
+                _context.Friends.Remove(userFriend);
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+            userFriend = _context.Users.Include(u => u.Friends).SingleOrDefault(u => u.UserID == friendid).Friends.SingleOrDefault(f => f.UserFriendID == userid);
+
+            if (userFriend != null)
+            {
+                _context.Friends.Remove(userFriend);
+                _context.SaveChanges();
+                return null;
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+        [Authorize]
+        [HttpPost]
+        [Route("acceptFriend")]
+        public ActionResult<Friend> AcceptFriend(int userid, int friendid)
+        {
+            var userFriend = _context.Users.Include(u => u.Friends).SingleOrDefault(u => u.UserID == userid).Friends.SingleOrDefault(f => f.UserFriendID == friendid);
+            // _context.Entry(poll).State = EntityState.Modified;
+            if (userFriend != null)
+            {
+                userFriend.Status = 3;
+                _context.Entry(userFriend).State = EntityState.Modified;
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+            var userFriend2 = _context.Users.Include(u => u.Friends).SingleOrDefault(u => u.UserID == friendid).Friends.SingleOrDefault(f => f.UserFriendID == userid);
+
+            if (userFriend2 != null)
+            {
+                userFriend2.Status = 3;
+                _context.Entry(userFriend2).State = EntityState.Modified;
+                _context.SaveChanges();
+                return null;
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
 

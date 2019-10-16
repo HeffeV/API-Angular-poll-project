@@ -8,6 +8,7 @@ namespace AngularPollAPI.Models
     public class PollUser
     {
         public int PollUserID { get; set; }
+        public bool PollOwner { get; set; }
         public int UserID { get; set; }
         public int PollID { get; set; }
         public User User { get; set; }

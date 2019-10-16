@@ -9,5 +9,8 @@ namespace AngularPollAPI.Models
     {
         public int FriendID { get; set; }
         public int UserFriendID { get; set; }
+        
+        //1==sender//2==receiver//3==accepted
+        public int Status { get; set; }
     }
 }

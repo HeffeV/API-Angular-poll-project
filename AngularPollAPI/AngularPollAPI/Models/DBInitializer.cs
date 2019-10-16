@@ -29,14 +29,22 @@ namespace AngularPollAPI.Models
             {
                 new Friend()
                 {
-                    UserFriendID = 2
+                    UserFriendID = 2,
+                    Status=3
+                },
+                new Friend()
+                {
+                    UserFriendID = 3,
+                    Status=2
                 }
             };
-
+            pollUser.PollOwner = true;
             pollUser.User = user;
             pollUser.Poll = new Poll()
             {
                 Name = "TestPoll",
+                Owner = 1,
+                SingleVote = true,
                 PollAnswers = new List<PollAnswer>()
                 {
                     new PollAnswer()
@@ -58,35 +66,9 @@ namespace AngularPollAPI.Models
 
             };
 
-            context.PollUsers.AddRange(pollUser);
+            //context.PollUsers.AddRange(pollUser);
 
-            Poll Poll = new Poll()
-            {
-                Name = "Poll Invited",
-                PollAnswers = new List<PollAnswer>()
-                {
-                    new PollAnswer()
-                    {
-                        Answer="Yes", Poll=pollUser.Poll
-                    },
-                    new PollAnswer()
-                    {
-                        Answer="No", Poll=pollUser.Poll
-                    }
-                }
-
-            };
-
-            user.PollUserInvites = new List<PollUserInvite>()
-            {
-                new PollUserInvite()
-                {
-                    Poll = Poll
-                }
-            };
-
-        context.Users.AddRange(user);
-            context.Polls.AddRange(Poll);
+            PollUser pollUser2 = new PollUser();
 
             User user2 = new User();
             user2.Username = "Admin2";
@@ -96,11 +78,66 @@ namespace AngularPollAPI.Models
             {
                 new Friend()
                 {
-                    UserFriendID = 1
+                    UserFriendID = 1,
+                    Status=3
                 }
             };
+
+            user2.PollUsers = new List<PollUser>() { pollUser2 };
+            pollUser2.PollOwner = true;
+            pollUser2.User = user2;
+
+
+            Poll Poll2 = new Poll()
+            {
+                Name = "Poll Invited",
+                Owner = 2,
+                SingleVote = false,
+                PollAnswers = new List<PollAnswer>()
+                {
+                    new PollAnswer()
+                    {
+                        Answer="Yes", Poll=pollUser2.Poll
+                    },
+                    new PollAnswer()
+                    {
+                        Answer="No", Poll=pollUser2.Poll
+                    },
+                    new PollAnswer()
+                    {
+                        Answer="Maybe", Poll=pollUser2.Poll
+                    }
+                }
+
+            };
+
+            pollUser2.Poll = Poll2;
+
+            user.PollUserInvites = new List<PollUserInvite>()
+            {
+                new PollUserInvite()
+                {
+                    Poll = Poll2
+                }
+            };
+
+            context.Users.AddRange(user);
             context.Users.AddRange(user2);
 
+            User user3 = new User();
+            user3.Username = "Admin3";
+            user3.Password = "admin3";
+            user3.Email = "admin3@thomasmore.be";
+            user3.Friends = new List<Friend>()
+            {
+                new Friend()
+                {
+                    UserFriendID = 1,
+                    Status=1
+                }
+            };
+
+            context.Users.AddRange(user3);
             //context.Polls.AddRange(poll);
             //context.PollAnswers.AddRange(pollAnswer, pollAnswer2);
             //context.PollAnswerVotes.Add(pollAnswerVote);
