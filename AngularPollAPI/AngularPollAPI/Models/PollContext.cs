@@ -16,6 +16,7 @@ namespace AngularPollAPI.Models
         public DbSet<PollAnswerVote> PollAnswerVotes { get; set; }
         public DbSet<PollUser> PollUsers { get; set; }
         public DbSet<PollUserInvite> PollUserInvites { get; set; }
+        public DbSet<FriendWaitList> FriendWaitLists { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
         { 
             modelBuilder.Entity<User>().ToTable("User");
@@ -25,6 +26,7 @@ namespace AngularPollAPI.Models
             modelBuilder.Entity<PollAnswerVote>().ToTable("PollAnswerVote");
             modelBuilder.Entity<PollUser>().ToTable("PollUser");
             modelBuilder.Entity<PollUserInvite>().ToTable("PollUserInvite");
+            modelBuilder.Entity<FriendWaitList>().ToTable("FriendWaitList");
         }
     }
 }

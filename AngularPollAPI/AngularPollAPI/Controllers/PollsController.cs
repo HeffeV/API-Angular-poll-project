@@ -153,6 +153,31 @@ namespace AngularPollAPI.Controllers
             return Ok();
         }
 
+        [Authorize]
+        [HttpPost]
+        [Route("addAnswer")]
+        public ActionResult<PollAnswer> AddAnswer(int pollID,string answer)
+        {
+            var poll = _context.Polls.Find(pollID);
+
+            if (poll != null)
+            {
+                PollAnswer pollAnswer = new PollAnswer()
+                {
+                    PollID = poll.PollID,
+                    Answer = answer,
+                    Poll = poll,
+                    PollAnswerVotes = new List<PollAnswerVote>()
+                };
+
+                _context.PollAnswers.Add(pollAnswer);
+                _context.SaveChanges();
+
+                return Ok();
+            }
+            else return NotFound();
+        }
+
 
         [HttpGet]
         [Route("homePageStats")]
@@ -167,10 +192,11 @@ namespace AngularPollAPI.Controllers
         }
 
         // GET: api/Polls/5
+        [Authorize]
         [HttpGet("{id}")]
-        public async Task<ActionResult<Poll>> GetPoll(int id)
+        public ActionResult<Poll> GetPoll(int id)
         {
-            var poll = await _context.Polls.FindAsync(id);
+            var poll = _context.Polls.Include(e => e.PollAnswers).ThenInclude(e=>e.PollAnswerVotes).SingleOrDefault(e => e.PollID == id);
 
             if (poll == null)
             {
@@ -180,22 +206,65 @@ namespace AngularPollAPI.Controllers
             return poll;
         }
 
-        // DELETE: api/Polls/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Poll>> DeletePoll(int id)
+        [Authorize]
+        [HttpPut]
+        [Route("updatePoll")]
+        public ActionResult<Poll> UpdatePoll(int pollid,string name,bool vote)
         {
-            var poll = await _context.Polls.FindAsync(id);
+            var poll = _context.Polls.Find(pollid);
+
+            if (poll != null)
+            {
+                poll.Name = name;
+                poll.SingleVote = vote;
+
+                _context.Entry(poll).State = EntityState.Modified;
+
+                _context.SaveChanges();
+
+                return Ok();
+            }
+            else return NotFound();
+
+        }
+
+        // DELETE: api/Polls/5
+        [Authorize]
+        [HttpDelete("{id}")]
+        public ActionResult<Poll> DeletePoll(int id)
+        {
+            var poll = _context.Polls.Include(e => e.PollUsers).Include(e => e.PollAnswers).ThenInclude(e => e.PollAnswerVotes).SingleOrDefault(e => e.PollID == id);
             if (poll == null)
             {
                 return NotFound();
             }
 
             _context.Polls.Remove(poll);
-            await _context.SaveChangesAsync();
+            _context.PollUserInvites.RemoveRange(_context.PollUserInvites.Where(e => e.PollID == id));
+            _context.SaveChanges();
 
             return poll;
         }
 
+        [Authorize]
+        [HttpDelete]
+        [Route("deleteAnswer")]
+        public ActionResult<PollAnswer> DeleteAnswer(int answerid)
+        {
+            var answer = _context.PollAnswers.Include(e => e.PollAnswerVotes).SingleOrDefault(e => e.PollAnswerID == answerid);
+
+            if (answer != null)
+            {
+                _context.PollAnswers.Remove(answer);
+                _context.SaveChanges();
+
+                return Ok();
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
         private bool PollExists(int id)
         {
             return _context.Polls.Any(e => e.PollID == id);

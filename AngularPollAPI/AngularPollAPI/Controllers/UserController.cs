@@ -107,7 +107,7 @@ namespace AngularPollAPI.Controllers
             {
                 _context.Friends.Remove(userFriend);
                 _context.SaveChanges();
-                return null;
+                return Ok();
             }
             else
             {
@@ -138,11 +138,59 @@ namespace AngularPollAPI.Controllers
                 userFriend2.Status = 3;
                 _context.Entry(userFriend2).State = EntityState.Modified;
                 _context.SaveChanges();
-                return null;
+                return Ok();
             }
             else
             {
                 return BadRequest();
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("addFriend")]
+        public ActionResult<Friend> AddFriend(int userid, string friendEmail)
+        {
+            if (!_context.Users.Any(e => e.Email == friendEmail))
+            {
+                FriendWaitList friendWaitList = new FriendWaitList()
+                {
+                    SenderUserID = userid,
+                    UserEmail = friendEmail
+                };
+
+                _context.FriendWaitLists.Add(friendWaitList);
+
+                _context.SaveChanges();
+
+                return BadRequest();
+            }
+            else
+            {
+                var UserFriend = _context.Users.Include(e=>e.Friends).SingleOrDefault(e => e.Email == friendEmail);
+                var user = _context.Users.Include(e => e.Friends).SingleOrDefault(e => e.UserID==userid) ;
+
+                Friend friend1 = new Friend()
+                {
+                    Status = 1,
+                    UserFriendID = UserFriend.UserID
+                };
+                Friend friend2 = new Friend()
+                {
+                    Status = 2,
+                    UserFriendID = user.UserID
+                };
+
+                UserFriend.Friends.Add(friend2);
+                user.Friends.Add(friend1);
+
+                _context.Entry(UserFriend).State = EntityState.Modified;
+                _context.Entry(user).State = EntityState.Modified;
+
+                _context.SaveChanges();
+
+                return Ok();
+
             }
         }
 
@@ -153,8 +201,40 @@ namespace AngularPollAPI.Controllers
         {
             if (!_context.Users.Any(e=>e.Username==user.Username)&& !_context.Users.Any(e => e.Email == user.Email))
             {
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
+                //check if already invited before
+                var friendwaitlist = _context.FriendWaitLists.SingleOrDefault(e => e.UserEmail == user.Email);
+                if (friendwaitlist != null)
+                {
+                    user.Friends = new List<Friend>()
+                    {
+                        new Friend()
+                        {
+                            Status=2,
+                            UserFriendID = friendwaitlist.SenderUserID
+                        }
+                    };
+
+                    _context.Users.Add(user);
+                    await _context.SaveChangesAsync();
+
+                    //add new user to existingUser friends
+                    var existingUser = _context.Users.Include(e => e.Friends).SingleOrDefault(e => e.UserID == friendwaitlist.SenderUserID);
+                    existingUser.Friends.Add(new Friend()
+                    {
+                        Status = 1,
+                        UserFriendID = _context.Users.SingleOrDefault(e=>e.Email==user.Email).UserID
+                    });
+
+                    _context.FriendWaitLists.Remove(friendwaitlist);
+                    _context.Entry(existingUser).State = EntityState.Modified;
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    _context.Users.Add(user);
+                    await _context.SaveChangesAsync();
+                }
+
 
                 return CreatedAtAction("GetUser", new { id = user.UserID }, user);
             }
