@@ -25,24 +25,16 @@ namespace AngularPollAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Poll>> GetPollsFromUser(int userid)
         {
+            //get pollUsers where userID is the same 
             var pollUser = _context.PollUsers.Where(p => p.UserID == userid).ToList();
             List<Poll> polls = new List<Poll>();
 
             foreach (PollUser polluser in pollUser)
             {
-                polls.Add(_context.Polls.SingleOrDefault(p => p.PollID == polluser.PollID));
+                //foreach polluser get the corresponding poll and add it to the list.
+                polls.Add(_context.Polls.Include(e=>e.PollAnswers).ThenInclude(e=>e.PollAnswerVotes).SingleOrDefault(p => p.PollID == polluser.PollID));
             }
 
-            foreach (Poll poll in polls)
-            {
-                poll.PollAnswers = (_context.PollAnswers.Where(p => p.PollID == poll.PollID).ToList());
-
-                foreach (PollAnswer pollAnswer in poll.PollAnswers)
-                {
-                    pollAnswer.PollAnswerVotes = _context.PollAnswerVotes.Where(p => p.PollAnswerID == pollAnswer.PollAnswerID).ToList();
-                }
-
-            }
             return polls;
         }
 
@@ -54,6 +46,7 @@ namespace AngularPollAPI.Controllers
             User user = _context.Users.Include(inv => inv.PollUserInvites).SingleOrDefault(u => u.UserID == userid);
             List<Poll> polls = new List<Poll>();
 
+            //get the poll with the pollid from each polluserinvite
             foreach (PollUserInvite pollInvite in user.PollUserInvites)
             {
                 polls.Add(_context.Polls.Find(pollInvite.PollID));
@@ -66,14 +59,17 @@ namespace AngularPollAPI.Controllers
         [Route("acceptPoll")]
         public ActionResult<Poll> AcceptPoll(int userID, int pollID)
         {
+            //get the user
             var user = _context.Users.Include(inv => inv.PollUserInvites).SingleOrDefault(p => p.UserID == userID);
 
             if (user != null)
             {
+                //remove the poll invite
                 var invite = user.PollUserInvites.FirstOrDefault(p => p.PollID == pollID);
 
                 _context.PollUserInvites.Remove(invite);
 
+                //create a new polluser with the user and poll.
                 PollUser pollUser = new PollUser()
                 {
                     PollID = invite.PollID,
@@ -84,9 +80,9 @@ namespace AngularPollAPI.Controllers
                 _context.PollUsers.Add(pollUser);
 
                 _context.SaveChanges();
-
+                //return accepted poll.
                 var poll = _context.Polls.FirstOrDefault(p => p.PollID == pollID);
-
+                
                 return poll;
             }
             else return BadRequest();
@@ -152,7 +148,9 @@ namespace AngularPollAPI.Controllers
         [Route("inviteUserToPoll")]
         public ActionResult<IEnumerable<PollUserInvite>> InviteUserToPoll(int pollID, int userID)
         {
+            //get the poll
             var poll = _context.Polls.Find(pollID);
+            //get the user
             var user = _context.Users.Include(e => e.PollUserInvites).Include(e => e.PollUsers).SingleOrDefault(e => e.UserID == userID);
 
             if (poll != null && user != null)
@@ -162,12 +160,12 @@ namespace AngularPollAPI.Controllers
                 userinvites.AddRange(user.PollUserInvites.Where(e => e.PollID == pollID));
                 List<PollUser> pollusers = new List<PollUser>();
                 pollusers.AddRange(user.PollUsers.Where(e => e.PollID == pollID));
-
+                //check if the user is already invited to this poll
                 if (userinvites.Count > 0 || pollusers.Count > 0)
                 {
                     return BadRequest();
                 }
-
+                //add pollinvite
                 PollUserInvite pollUserInvite = new PollUserInvite()
                 {
                     Poll = poll,
@@ -189,9 +187,9 @@ namespace AngularPollAPI.Controllers
         [Route("addPoll")]
         public ActionResult<int> AddPoll (Poll poll)
         {
-
+            //get the user
             var user = _context.Users.Find(poll.Owner);
-
+            //create poll
             Poll newPoll = new Poll()
             {
                 Name = poll.Name,
@@ -200,7 +198,7 @@ namespace AngularPollAPI.Controllers
                 PollUsers = new List<PollUser>(),
                 PollAnswers = new List<PollAnswer>(),
             };
-
+            //add user to poll
             newPoll.PollUsers.Add(new PollUser()
             {
                 PollOwner = true,
@@ -208,7 +206,7 @@ namespace AngularPollAPI.Controllers
                 User = user,
                 UserID=user.UserID
             });
-
+            //save
             _context.Polls.Add(newPoll);
             _context.SaveChanges();
 
@@ -222,10 +220,12 @@ namespace AngularPollAPI.Controllers
         [Route("addAnswer")]
         public ActionResult<PollAnswer> AddAnswer(int pollID, string answer)
         {
+            //get the poll
             var poll = _context.Polls.Find(pollID);
 
             if (poll != null)
             {
+                //create answer and add to poll
                 PollAnswer pollAnswer = new PollAnswer()
                 {
                     PollID = poll.PollID,
@@ -275,10 +275,12 @@ namespace AngularPollAPI.Controllers
         [Route("updatePoll")]
         public ActionResult<Poll> UpdatePoll(int pollid, string name, bool vote)
         {
+            //get poll object
             var poll = _context.Polls.Find(pollid);
 
             if (poll != null)
             {
+                //update poll data
                 poll.Name = name;
                 poll.SingleVote = vote;
 
@@ -297,12 +299,13 @@ namespace AngularPollAPI.Controllers
         [HttpDelete("{id}")]
         public ActionResult<Poll> DeletePoll(int id)
         {
+            //get poll
             var poll = _context.Polls.Include(e => e.PollUsers).Include(e => e.PollAnswers).ThenInclude(e => e.PollAnswerVotes).SingleOrDefault(e => e.PollID == id);
             if (poll == null)
             {
                 return NotFound();
             }
-
+            //remove poll
             _context.Polls.Remove(poll);
             _context.PollUserInvites.RemoveRange(_context.PollUserInvites.Where(e => e.PollID == id));
             _context.SaveChanges();
@@ -315,10 +318,12 @@ namespace AngularPollAPI.Controllers
         [Route("deleteAnswer")]
         public ActionResult<PollAnswer> DeleteAnswer(int answerid)
         {
+            //get answer
             var answer = _context.PollAnswers.Include(e => e.PollAnswerVotes).SingleOrDefault(e => e.PollAnswerID == answerid);
 
             if (answer != null)
             {
+                //remove answer
                 _context.PollAnswers.Remove(answer);
                 _context.SaveChanges();
 
