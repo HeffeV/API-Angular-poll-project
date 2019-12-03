@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAU0onz+31G0CkGfkw7QWYzgAAAAACAAAAAAAQZgAAAAEAACAAAABD95m4BaJm93DatVG1PU0Lq6NHGWeJOCF5Uahc+IZ3kAAAAAAOgAAAAAIAACAAAADEvevMTPHnO1BkGV6CP+oR24mwluDNNM7LXvrNWVlhuIAAAAD8bQ4lQC6l47hXJCU0mpxs+qTCxK1eCS8F0DGfifxrIYOazR/pjvbaAb3vYUW2NvBoFEexJcjoBDGwULPioPc8STZj70GFx57s83kQU2Dn+Kqq1lHrW9hf2ja1ZDo1LU2+b8g35GL/88o0ipiUcYdRWT707rHVj3ckwC5bwmZY00AAAAC51nsvC8gQPgrcPiYbA0xsE1F6oZ7+m21wkGS3J7w31O7r0J9XARDQAAzrsbL+OXEhM/E0hlI6LJlMprU8f3bi</EncryptedPassword>
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="DefaultConnection">
+      <Value>Server=tcp:jeffdriesserver.database.windows.net,1433%3bInitial Catalog=PollDatabase%3bPersist Security Info=False%3bUser ID=admin1%3bPassword=%40leukethomasmore1%3bMultipleActiveResultSets=False%3bEncrypt=True%3bTrustServerCertificate=False%3bConnection Timeout=30%3b</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+</Project>
